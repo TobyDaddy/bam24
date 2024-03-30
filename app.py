@@ -11,7 +11,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
 
-class Image(db.Model):
+class ImageModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.LargeBinary)
 
@@ -19,7 +19,7 @@ class Image(db.Model):
 def upload_file():
     if request.method == 'POST':
         file = request.files['file']
-        image = Image(data=file.read())
+        image = ImageModel(data=file.read())
         db.session.add(image)
         db.session.commit()
         return redirect(url_for('uploaded_file', id=image.id))
@@ -28,7 +28,7 @@ def upload_file():
 
 @app.route('/uploads/<id>')
 def uploaded_file(id):
-    image = Image.query.get(id)
+    image = ImageModel.query.get(id)
     return base64.b64encode(image.data)
 
 if __name__ == '__main__':
