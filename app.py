@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://fwwwfkjoco:7O48FKA30IRL0L68$@bamaster-server.postgres.database.azure.com/bamaster-database'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['AZURE_STORAGE_CONNECTION_STRING'] = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-app.config['AZURE_STORAGE_CONTAINER_NAME'] = 'images'
 
 def connect_db():
     try:
@@ -49,9 +47,8 @@ def generate_sas_token(account_name, account_key, container_name, blob_name):
 def upload():
     file = request.files['file']
     blob_name = secure_filename(file.filename)
-    sas_token = 'sp=w&st=2024-03-30T14:25:47Z&se=2024-03-30T22:25:47Z&sv=2022-11-02&sr=c&sig=j1Cvw5kaYZ7NdlLUZ%2F4nkptYNqaDyvnI7%2BjyCRYKz2A%3D'
 
-    return jsonify({'sas_token': sas_token})
+    return jsonify({'sas_token': 'sp=w&st=2024-03-30T14:25:47Z&se=2024-03-30T22:25:47Z&sv=2022-11-02&sr=c&sig=j1Cvw5kaYZ7NdlLUZ%2F4nkptYNqaDyvnI7%2BjyCRYKz2A%3D'})
 
 if __name__ == "__main__":
     app.run(debug=True)
