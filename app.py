@@ -13,7 +13,7 @@ def connect_db():
     try:
         conn = psycopg2.connect(
             user="fwwwfkjoco",
-            password="your_password",
+            password="7O48FKA30IRL0L68$",
             host="bamaster-server.postgres.database.azure.com",
             port="5432",
             database="bamaster-database"
