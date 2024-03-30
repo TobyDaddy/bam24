@@ -4,9 +4,10 @@ from PIL import Image
 import os
 import io
 import base64
+import psycopg2
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://fwwwfkjoco:7O48FKA30IRL0L68$@bamaster-server.postgres.database.azure.com/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://fwwwfkjoco:7O48FKA30IRL0L68$@bamaster-server.postgres.database.azure.com/bamaster-database'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
@@ -39,15 +40,31 @@ def uploaded_file(id):
     image_data = base64.b64encode(image.data).decode('ascii')
     return render_template('uploaded.html', img_data=image_data)
 
+def connect_db():
+    try:
+        conn = psycopg2.connect(
+            user="fwwwfkjoco",
+            password="7O48FKA30IRL0L68$",
+            host="bamaster-server.postgres.database.azure.com",
+            port="5432",
+            database="bamaster-database"
+        )
+        return conn
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
 @app.route('/dbtest')
 def dbtest():
-    try:
-        with db.engine.connect() as connection:
-            result = connection.execute('SELECT version()')
-            version = result.fetchone()[0]
-            return f"Connected to PostgreSQL database! Version: {version}"
-    except Exception as e:
-        return f"Failed to connect to database: {str(e)}"
+    conn = connect_db()
+    if conn is not None:
+        cur = conn.cursor()
+        cur.execute('SELECT version()')
+        version = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        return f"Connected to PostgreSQL database! Version: {version}"
+    else:
+        return "Failed to connect to database"
 
 if __name__ == '__main__':
     db.create_all()
