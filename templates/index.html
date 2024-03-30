@@ -18,6 +18,12 @@
   </section>
   <script src="./dist/main.js" type="text/javascript"></script>
     <script>
+        blobUpload = function(file, url, container, sasKey) {
+            var blobName = buildBlobName(file);
+            var login = `${url}/${container}/${blobName}?${sasKey}`;
+            var blockBlobClient = new BlockBlobClient(login, new AnonymousCredential());
+            blockBlobClient.uploadBrowserData(file);
+        };
         (async function () {
             const url="https://bamasterimge.blob.core.windows.net/images?sp=rw&st=2024-03-30T15:11:02Z&se=2024-03-30T23:11:02Z&sv=2022-11-02&sr=c&sig=RflIulQTlsI022N6RQRikWvyyie6KaxQz8GFDBGzCL4%3D";
             const sasKey = "sp=rw&st=2024-03-30T15:11:02Z&se=2024-03-30T23:11:02Z&sv=2022-11-02&sr=c&sig=RflIulQTlsI022N6RQRikWvyyie6KaxQz8GFDBGzCL4%3D";
