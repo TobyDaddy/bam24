@@ -31,7 +31,7 @@ def dbtest():
         cur = conn.cursor()
 
 def generate_sas_token(account_name, account_key, container_name, blob_name):
-    blob_service_client = BlobServiceClient(account_url=f"https://{account_name}.blob.core.windows.net", credential=account_key)
+    blob_service_client = BlobServiceClient(account_url=f"https://bamasterimge.blob.core.windows.net", credential=account_key)
     blob_client = blob_service_client.get_blob_client(container_name, blob_name)
 
     sas_token = generate_blob_sas(
@@ -49,7 +49,7 @@ def generate_sas_token(account_name, account_key, container_name, blob_name):
 def upload():
     file = request.files['file']
     blob_name = secure_filename(file.filename)
-    sas_token = generate_sas_token('your_account_name', 'your_account_key', 'your_container_name', blob_name)
+    sas_token = generate_sas_token('bamasterimge', 'DefaultEndpointsProtocol=https;AccountName=bamasterimge;AccountKey=DRwCR3smweNe/PEb0pm2slBSQFPWGhUWVgto+4g160f3y/1dXasNiEsmmz9HnbwyMK7//i731Cwn+AStJYsRRw==;EndpointSuffix=core.windows.net', 'images', blob_name)
 
     return jsonify({'sas_token': sas_token})
 
