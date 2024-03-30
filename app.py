@@ -26,4 +26,5 @@ def upload_file():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True)
+    port = os.getenv('PORT', '5000')  # 使用环境变量PORT指定的端口，如果没有指定，则默认使用5000端口
+    app.run(host='0.0.0.0', port=int(port), debug=True)
