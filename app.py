@@ -33,7 +33,11 @@ def upload_file():
 @app.route('/uploads/<id>')
 def uploaded_file(id):
     image = ImageModel.query.get(id)
-    return base64.b64encode(image.data)
+    if image is None:
+        return render_template('error.html'), 404
+
+    image_data = base64.b64encode(image.data).decode('ascii')
+    return render_template('uploaded.html', img_data=image_data)
 
 if __name__ == '__main__':
     db.create_all()
