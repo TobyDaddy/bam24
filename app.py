@@ -21,6 +21,19 @@ def connect_db():
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+@app.route('/dbtest')
+def dbtest():
+    conn = connect_db()
+    if conn is not None:
+        cur = conn.cursor()
+        cur.execute('SELECT version()')
+        version = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        return f"Connected to PostgreSQL database! Version: {version}"
+    else:
+        return "Failed to connect to database"
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
