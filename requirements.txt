@@ -1,4 +1,5 @@
 flask
 flask-sqlalchemy
 psycopg2-binary
-pillow
+pillowazure-storage-blob
+azure-storage-blob
