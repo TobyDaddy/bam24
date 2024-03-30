@@ -11,7 +11,6 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
 
-db.create_all()
 class ImageModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.LargeBinary)
@@ -51,4 +50,5 @@ def dbtest():
         return f"Failed to connect to database: {str(e)}"
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
