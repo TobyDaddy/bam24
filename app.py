@@ -17,12 +17,16 @@ class ImageModel(db.Model):
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        image = ImageModel(data=file.read())
-        db.session.add(image)
-        db.session.commit()
-        return redirect(url_for('uploaded_file', id=image.id))
+    try:
+        if request.method == 'POST':
+            file = request.files['file']
+            image = ImageModel(data=file.read())
+            db.session.add(image)
+            db.session.commit()
+            return redirect(url_for('uploaded_file', id=image.id))
+    except Exception as e:
+        app.logger.error(f"Error occurred: {e}")
+        return render_template('error.html'), 500
 
     return render_template('index.html')
 
