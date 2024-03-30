@@ -49,12 +49,7 @@ def generate_sas_token(account_name, account_key, container_name, blob_name):
 def upload():
     file = request.files['file']
     blob_name = secure_filename(file.filename)
-    tmp1='DefaultEndpointsProtocol=ht'
-    tmp2='tps;AccountName=bamasterimge;AccountKey='
-    tmp3='DRwCR3smweNe/PEb0pm2slBSQFPWGhUWVg'
-    tmp4='to+4g160f3y/1dXasNiEsmmz9HnbwyMK7//i'
-    tmp5='731Cwn+AStJYsRRw==;EndpointSuffix=core.windows.net'
-    sas_token = generate_sas_token('bamasterimge',tmp1+tmp2+tmp3+tmp4+tmp5 , 'images', blob_name)
+    sas_token = 'sp=w&st=2024-03-30T14:25:47Z&se=2024-03-30T22:25:47Z&sv=2022-11-02&sr=c&sig=j1Cvw5kaYZ7NdlLUZ%2F4nkptYNqaDyvnI7%2BjyCRYKz2A%3D'
 
     return jsonify({'sas_token': sas_token})
 
