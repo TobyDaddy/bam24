@@ -39,6 +39,16 @@ def uploaded_file(id):
     image_data = base64.b64encode(image.data).decode('ascii')
     return render_template('uploaded.html', img_data=image_data)
 
+@app.route('/dbtest')
+def dbtest():
+    try:
+        with db.engine.connect() as connection:
+            result = connection.execute('SELECT version()')
+            version = result.fetchone()[0]
+            return f"Connected to PostgreSQL database! Version: {version}"
+    except Exception as e:
+        return f"Failed to connect to database: {str(e)}"
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
