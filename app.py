@@ -1,63 +1,40 @@
-from flask import Flask, request, redirect, url_for, render_template
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_blob_sas, BlobSasPermissions
+from datetime import datetime, timedelta
+from flask import Flask, request
 import os
-import io
-import base64
-import psycopg2
-from psycopg2 import sql
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://fwwwfkjoco:7O48FKA30IRL0L68$@bamaster-server.postgres.database.azure.com/bamaster-database'
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-def connect_db():
-    try:
-        conn = psycopg2.connect(
-            user="fwwwfkjoco",
-            password="7O48FKA30IRL0L68$",#"your_password",#
-            host="bamaster-server.postgres.database.azure.com",
-            port="5432",
-            database="bamaster-database"
-        )
-        return conn
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        
-@app.route('/dbtest')
-def dbtest():
-    conn = connect_db()
-    if conn is not None:
-        cur = conn.cursor()
-        cur.execute('SELECT version()')
-        version = cur.fetchone()[0]
-        cur.close()
-        conn.close()
-        return f"Connected to PostgreSQL database! Version: {version}"
-    else:
-        return "Failed to connect to database"
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['POST'])
 def upload_file():
-    try:
-        if request.method == 'POST':
-            file = request.files['file']
-            data = file.read()
+    file = request.files['file']
+    filename = file.filename
 
-            conn = connect_db()
-            if conn is not None:
-                cur = conn.cursor()
-                insert = sql.SQL('INSERT INTO image_model (data) VALUES (%s) RETURNING id')
-                cur.execute(insert, (psycopg2.Binary(data),))
-                id = cur.fetchone()[0]
-                conn.commit()
-                cur.close()
-                conn.close()
+    # Azure Blob Storage的连接字符串和容器名称
+    connect_str = 'DefaultEndpointsProtocol=https;AccountName=bamasterimge;AccountKey=DRwCR3smweNe/PEb0pm2slBSQFPWGhUWVgto+4g160f3y/1dXasNiEsmmz9HnbwyMK7//i731Cwn+AStJYsRRw==;EndpointSuffix=core.windows.net'
+    container_name = 'images'
 
-                return redirect(url_for('uploaded_file', id=id))
-    except Exception as e:
-        app.logger.error(f"Error occurred: {e}")
-        return render_template('error.html'), 500
+    # 创建BlobServiceClient对象，然后获取容器客户端
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    container_client = blob_service_client.get_container_client(container_name)
 
-    return render_template('index.html')
+    # 上传文件到Azure Blob Storage
+    blob_client = container_client.get_blob_client(filename)
+    blob_client.upload_blob(file)
+
+    # 生成SAS
+    sas_token = generate_blob_sas(
+        blob_service_client.account_name,
+        container_name,
+        blob_client.blob_name,
+        account_key=blob_service_client.credential.account_key,
+        permission=BlobSasPermissions(read=True),
+        expiry=datetime.utcnow() + timedelta(hours=1)
+    )
+
+    # 返回SAS URL
+    sas_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{container_name}/{blob_client.blob_name}?{sas_token}"
+    return {'sas_url': sas_url}
 
 if __name__ == '__main__':
     app.run(debug=True)
