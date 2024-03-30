@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'  # 使用SQLite数据库，你可以根据需要更改
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://qydmvsoaee@bam-server:87J4OM1WG64J3DMX$@bam-server.postgres.database.azure.com:5432/bam-database'  # 使用SQLite数据库，你可以根据需要更改
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 db = SQLAlchemy(app)
 
